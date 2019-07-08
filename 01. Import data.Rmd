@@ -1,0 +1,38 @@
+---
+title: "Import data"
+output: html_notebook
+---
+
+**Suitable for excel files converted using JAVA script converter only**
+
+
+```{r}
+#import and combine raw data 
+library(data.table)
+library(plyr)
+
+combine_raw_files <- function(read_dir, object_name, file.number, env = parent.frame()){
+  require(data.table)
+  all_file_names <- list.files(path = read_dir, full.names = TRUE, recursive = TRUE) # creates a list of all individual files to import and combine
+  if(missing(file.number)) file.number = length(all_file_names);
+  import_files <-all_file_names[1:file.number] # select only certain number of files
+  # Binds each imported datatable into a list
+  file_list <- lapply(import_files, readxl::read_excel, sheet= 1, col_names = TRUE, col_types ="text")
+  # Returns combined datatable with specified name
+  env[[object_name]] <- results<- rbindlist(file_list, use.names = TRUE, fill = TRUE)
+  invisible(results)
+  cat("You have read", length(import_files), "files", sep = " ") 
+}
+```
+
+```{r}
+#combinw files and create a data frame (data table)
+df <- combine_raw_files(path=)
+str(df)
+names(df) <- make.names(df)
+
+save(df, file = paste0("NAME of file.Rdata"))
+
+
+```
+
